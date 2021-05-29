@@ -45,10 +45,10 @@
         </div>
     </form>
 
-    <div style="width: 500px">
-    <canvas id="myChart" width="400" height="400"></canvas>
+    <div style="padding: 10px; width: 500px; height: 400px" id="chartHolder">
+    <canvas id="myChart"></canvas>
     </div>
-    
+
     <script type="text/javascript">
     function getCurrentPar() {
         var u = document.getElementById('units');
@@ -155,6 +155,10 @@
         var prepayment = parseFloat(document.getElementById('prepayment').value) || 0;
         document.getElementById('prepayment').value = prepayment;
 
+        var c = document.getElementById('myChart');
+        var ch = document.getElementById('chartHolder');
+        ch.removeChild(c);
+
         // chart
         const data = {
             labels: [],
@@ -165,7 +169,6 @@
                 data: [],
             }]
         };
-        var ctx = document.getElementById('myChart').getContext('2d');
         const config = {
             type: 'line',
             data,
@@ -192,8 +195,11 @@
         data.labels.push('$' + (par * principal));
         data.datasets[0].data.push(surcharge.toFixed(2));
 
+        c = document.createElement('canvas');
+        c.id = 'myChart';
+        ch.appendChild(c);
         var myChart = new Chart(
-            document.getElementById('myChart'),
+            c,
             config
         );
 
