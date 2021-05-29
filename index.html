@@ -1,6 +1,7 @@
 <!doctype html>
 <html><head>
     <link rel="stylesheet" href="https://unpkg.com/mvp.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style type="text/css">
     input, label, select { display: inline; }
     div, button { clear: left}
@@ -44,7 +45,10 @@
         </div>
     </form>
 
-
+    <div style="width: 500px">
+    <canvas id="myChart" width="400" height="400"></canvas>
+    </div>
+    
     <script type="text/javascript">
     function getCurrentPar() {
         var u = document.getElementById('units');
@@ -151,6 +155,22 @@
         var prepayment = parseFloat(document.getElementById('prepayment').value) || 0;
         document.getElementById('prepayment').value = prepayment;
 
+        // chart
+        const data = {
+            labels: [],
+            datasets: [{
+                label: 'Monthly payment',
+                backgroundColor: 'rgb(255, 99, 132)',
+                borderColor: 'rgb(255, 99, 132)',
+                data: [],
+            }]
+        };
+        var ctx = document.getElementById('myChart').getContext('2d');
+        const config = {
+            type: 'line',
+            data,
+            options: {}
+        };
 
         var subprincipal = (par * principal) - prepayment;
         var r = rate / 12.0;
@@ -160,8 +180,30 @@
 
         document.getElementById('payment').innerText = '$' + newMonthly.toFixed(2);
 
+        var chartMax = Math.floor(((par * principal) + 999) / 1000) * 1000;
+        for(var a=0;a<=chartMax;a+=100) {
+            if (a > (par * principal))
+                continue;
+            var amt = ((par * principal) - a) * (r * Math.pow(1 + r, term) / (Math.pow(1 + r, term) - 1));
+            amt = amt + surcharge;
+            data.labels.push('$' + a);
+            data.datasets[0].data.push(amt.toFixed(2));
+        }
+        data.labels.push('$' + (par * principal));
+        data.datasets[0].data.push(surcharge.toFixed(2));
+
+        var myChart = new Chart(
+            document.getElementById('myChart'),
+            config
+        );
+
+        myChart.resize(400, 400);
+
         return false;
     }
+
+
+
     </script>
 </body>
 
