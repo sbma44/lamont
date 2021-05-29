@@ -1,0 +1,167 @@
+<!doctype html>
+<html><head>
+    <link rel="stylesheet" href="https://unpkg.com/mvp.css">
+    <style type="text/css">
+    input, label, select { display: inline; }
+    div, button { clear: left}
+    label { display: block; float: left; width: 10em}
+    </style>
+</head>
+<body>
+    <form onSubmit="return false">
+        <div>
+        <label for="principal">Principal</label>
+        <span id="principal"></span>
+        </div>
+
+        <div>
+        <label for="term">Term</label>
+        <span id="term"></span>
+        </div>
+
+        <div>
+        <label for="units">Apartment</label>
+        <select id="units"><option value="-1">-</option></select>
+        </div>
+
+        <div>
+        <label for="par">Par</label>
+        <span id="par"></span>
+        </div>
+
+        <div>
+        <label for="prepayment">Prepayment</label>
+        $<input type="text" value="0" id="prepayment" />
+        </div>
+
+        <div>
+        <label for="payment">Monthly Payment</label>
+        <span id="payment"></span>
+        </div>
+
+        <div>
+        <button onClick="recalc(); return false;" text="Recalculate">Recalculate</button>
+        </div>
+    </form>
+
+
+    <script type="text/javascript">
+    function getCurrentPar() {
+        var u = document.getElementById('units');
+        if (u.selectedIndex < 1) return false;
+        return u.options[u.selectedIndex].value;
+    }
+
+    var principal = 1400000;
+    var rate = 0.03875;
+    var term = 15 * 12;
+
+    var parValues = {
+        '10': 1.762,
+        '11': 2.492,
+        '20': 1.654,
+        '21': 1.726,
+        '22': 2.892,
+        '23': 1.424,
+        '24': 2.892,
+        '25': 2.150,
+        '26': 2.567,
+        '27': 1.962,
+        '28': 2.642,
+        '30': 2.012,
+        '31': 2.340,
+        '32': 1.726,
+        '33': 1.940,
+        '34': 2.227,
+        '35': 1.726,
+        '36': 2.265,
+        '40': 2.416,
+        '41': 2.492,
+        '42': 2.128,
+        '43': 2.352,
+        '44': 2.128,
+        '45': 2.416,
+        '46': 2.310,
+        '47': 2.310,
+        '48': 1.887,
+        '49': 2.416,
+        '50': 2.805,
+        '51': 3.752,
+        '52': 3.215,
+        '53': 3.398,
+        '54': 3.215,
+        '55': 3.564,
+        '56': 3.322,
+        '57': 3.588,
+        '58': 2.643,
+        '59': 3.700,
+        'P1': 0.216,
+        'P2': 0.216,
+        'P3': 0.216,
+        'P4': 0.216,
+        'P5': 0.216,
+        'P6': 0.216,
+        'P7': 0.216,
+        'P8': 0.216,
+        'P9': 0.216,
+        'P10': 0.252,
+        'P11': 0.252,
+        'P12': 0.252,
+        'P13': 0.216,
+        'P14': 0.216,
+        'P15': 0.216,
+        'P16': 0.216,
+        'P17': 0.252,
+        'P18': 0.252,
+        'P19': 0.252,
+        'P20': 0.252,
+        'P21': 0.252,
+        'P22': 0.252,
+        'P23': 0.252,
+        'P24': 0.216
+    };
+    Object.keys(parValues).forEach(function(apt) {
+        var opt = document.createElement('option');
+        opt.value = parValues[apt];
+        opt.innerText = apt;
+        document.getElementById('units').appendChild(opt);
+    });
+
+    document.getElementById('principal').innerText = '$' + principal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    document.getElementById('term').innerText = term + ' months';
+
+    document.getElementById('units').addEventListener('change', function(event) {
+        var par = getCurrentPar();
+        if (!par) return;
+        document.getElementById('par').innerText = par + '%';
+        recalc();
+    });
+
+    document.getElementById('prepayment').addEventListener('input', function(event) {
+        console.log('firing');
+        var p = document.getElementById('prepayment').value;
+        p = parseFloat(p);
+        if (p) recalc();
+    });
+
+    function recalc() {
+        var par = getCurrentPar();
+        if (!par) return;
+        par = parseFloat(par) / 100;
+
+        var prepayment = parseFloat(document.getElementById('prepayment').value) || 0;
+        document.getElementById('prepayment').value = prepayment;
+
+        var subprincipal = (par * principal) - prepayment;
+        var r = rate / 12.0;
+        var newMonthly = subprincipal * (r * Math.pow(1 + r, term) / (Math.pow(1 + r, term) - 1));
+        newMonthly = 1.1 * newMonthly;
+
+        document.getElementById('payment').innerText = '$' + newMonthly.toFixed(2);
+
+        return false;
+    }
+    </script>
+</body>
+
+</html>
