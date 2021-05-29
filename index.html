@@ -138,7 +138,6 @@
     });
 
     document.getElementById('prepayment').addEventListener('input', function(event) {
-        console.log('firing');
         var p = document.getElementById('prepayment').value;
         p = parseFloat(p);
         if (p) recalc();
@@ -152,10 +151,12 @@
         var prepayment = parseFloat(document.getElementById('prepayment').value) || 0;
         document.getElementById('prepayment').value = prepayment;
 
+
         var subprincipal = (par * principal) - prepayment;
         var r = rate / 12.0;
         var newMonthly = subprincipal * (r * Math.pow(1 + r, term) / (Math.pow(1 + r, term) - 1));
-        newMonthly = 1.1 * newMonthly;
+        var surcharge = 0.1 * ((subprincipal + prepayment)* (r * Math.pow(1 + r, term) / (Math.pow(1 + r, term) - 1)));
+        newMonthly = surcharge + newMonthly;
 
         document.getElementById('payment').innerText = '$' + newMonthly.toFixed(2);
 
